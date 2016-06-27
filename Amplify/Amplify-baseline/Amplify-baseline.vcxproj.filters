@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="private_libraries\graphics\buffers\buffer.cpp" />
+    <ClCompile Include="private_libraries\graphics\buffers\indexbuffer.cpp" />
+    <ClCompile Include="private_libraries\graphics\buffers\vertexarray.cpp" />
+    <ClCompile Include="private_libraries\graphics\shader.cpp" />
+    <ClCompile Include="private_libraries\maths\mat4.cpp" />
+    <ClCompile Include="private_libraries\maths\vec2.cpp" />
+    <ClCompile Include="private_libraries\maths\vec3.cpp" />
+    <ClCompile Include="private_libraries\maths\vec4.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="private_libraries\window\window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="private_libraries\graphics\buffers\buffer.h" />
+    <ClInclude Include="private_libraries\graphics\buffers\indexbuffer.h" />
+    <ClInclude Include="private_libraries\graphics\buffers\vertexarray.h" />
+    <ClInclude Include="private_libraries\graphics\shader.h" />
+    <ClInclude Include="private_libraries\maths\mat4.h" />
+    <ClInclude Include="private_libraries\maths\maths.h" />
+    <ClInclude Include="private_libraries\maths\maths_func.h" />
+    <ClInclude Include="private_libraries\maths\vec2.h" />
+    <ClInclude Include="private_libraries\maths\vec3.h" />
+    <ClInclude Include="private_libraries\maths\vec4.h" />
+    <ClInclude Include="private_libraries\utils\fileutils.h" />
+    <ClInclude Include="private_libraries\window\window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="private_libraries\shaders\basic.frag" />
+    <None Include="private_libraries\shaders\basic.vert" />
+  </ItemGroup>
+</Project>
