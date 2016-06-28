@@ -13,13 +13,12 @@
 //		- 
 
 namespace Erebos {
-	namespace graphics{
+	namespace graphics {
 		
-		//-------------Rogue functions instantiation
-		
-		//-------------end
 	
 		//----Window constructors
+		//------------------------------------------------------------------------------------------
+
 		Window::Window(const char* name, int width, int height)
 			{
 				m_Title = name;
@@ -27,7 +26,7 @@ namespace Erebos {
 				m_Height = height;
 			
 				//possible redundance, destroyst OpenGL window, cursor, resources. Investigate removal
-				if (!init())
+				if (!initialise())
 					glfwTerminate(); 
 
 				for (int i = 0; i < MAX_KEYS; i++)
@@ -44,41 +43,57 @@ namespace Erebos {
 
 			}
 
-		Window::~Window()
-		{
-			glfwTerminate();
-		}
-		//----end
+		//------------------------------------------------------------------------------------------
 
-		//---Window methods
-		bool Window::init() //-- Initialise GLFW Library, GLFW window creation, make window current, 
-							//resize callback, initialise GLEW
+		Window::~Window()
 			{
-				
+				glfwTerminate();
+			}
+
+		//------------------------------------------------------------------------------------------
+		//----end Window constructors
+
+		
+		//---WINDOW METHODS
+		//-----Initialise GLFW Library, GLFW window creation, make window current, 
+		//-----resize callback, initialise GLEW
+		//------------------------------------------------------------------------------------------
+		bool Window::initialise() 
+							
+			{
+				//-------------------Error handle GLFW Library init
 				if (!glfwInit() )//- Initialise GLFW Library,
 					{
 					std::cout << "Failed to initialize GLFW!" << std::endl;
 					return false;
 					}
-				//-GLFWwindow creation
+
+				//--------------------GLFWwindow creation
 				m_Window = glfwCreateWindow(m_Width, m_Height, m_Title, NULL, NULL);
-			
+				//-------------------Error handle Window creation
 				if (!m_Window)
 					{	
 					glfwTerminate();
 					std::cout << "Failed to create GLFW Window." << std::endl;
 					return false;
 					}
+
 				//-Make GLFWwindow current
 				glfwMakeContextCurrent(m_Window);
-				//-Trigger for window resize callback (auto-function), triggers windowResize()
+				
+				//-Instantiate pointer to current user window
+				//-fetch with: glfwGetWindowUserPointer()
 				glfwSetWindowUserPointer(m_Window, this);
+
+				//-EVENT CALLBACKS
 				glfwSetWindowSizeCallback(m_Window,windowResize);
 				glfwSetKeyCallback(m_Window, key_callback);
 				glfwSetMouseButtonCallback(m_Window, mouse_button_callback);
 				glfwSetCursorPosCallback(m_Window, cursor_position_callback);
 
+
 				//-Initialise GLEW
+				//-------------------Error handle GLEW initialisation
 				if (glewInit() != GLEW_OK)
 					{
 					std::cout << "Could not initialise GLEW!" << std::endl;
@@ -90,13 +105,55 @@ namespace Erebos {
 				return true;
 
 			}
+		//------------------------------------------------------------------------------------------
 
-		//--Tests window close flag, acts as game loop for now
+		//=============REFRESH SCREEN PART===========
+		void Window::clear() const
+			{
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			}
+		//------------------------------------------------------------------------------------------
+
+		//==========Tests window close flag, acts as game loop for now===========
 		bool Window::closed() const
-		{
-			return glfwWindowShouldClose(m_Window)==1;
-		}
+			{
+				return glfwWindowShouldClose(m_Window)==1;
+			}
+		//------------------------------------------------------------------------------------------
 
+		//==================Draw updates=========================================
+		void Window::update()
+			{
+
+				GLenum error = glGetError();
+				if (error != GL_NO_ERROR)
+					std::cout << "OpenGL Error:" << error << std::endl;
+
+				glfwPollEvents();//-process events in the event queue - eg input
+				//glfwGetFramebufferSize(m_Window, &m_Width, &m_Height);
+				glfwSwapBuffers(m_Window);//Swap front and back buffers for rendering			
+
+			}
+		//------------------------------------------------------------------------------------------
+
+		//============Resize window function=====================================
+		void windowResize(GLFWwindow* window, int width, int height)
+			{
+
+				Window* win = (Window*)glfwGetWindowUserPointer(window);
+				glViewport(0, 0, width, height);//sets viewport dimensions
+				win->m_Width = width;
+				win->m_Height = height;
+
+			}
+		//------------------------------------------------------------------------------------------
+
+		//===========Set window background color====================================
+		void Window::WindowColor(float r, float g, float b, float a)
+		{
+			glClearColor(r, g, b, a);
+		}
+		//------------------------------------------------------------------------------------------
 
 		bool Window::isKeyPressed(unsigned int keycode) const
 		{
@@ -117,41 +174,27 @@ namespace Erebos {
 			x = m_Mx;
 			y = m_My;
 		}
-		//--part of refresh screen
-		void Window::clear() const
-		{
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		}
+		
 
-		//draw updates
-		void Window::update() 
-		{
 
-			GLenum error = glGetError();
-			if (error != GL_NO_ERROR)
-				std::cout << "OpenGL Error:" << error << std::endl;
 
-			glfwPollEvents();//-process events in the event queue - eg input
-//glfwGetFramebufferSize(m_Window, &m_Width, &m_Height);
-			
-			glfwSwapBuffers(m_Window);//Swap front and back buffers for rendering			
-		}
-
-		//--Resize window function
-		void windowResize(GLFWwindow* window, int width, int height)
-		{
-
-			Window* win = (Window*)glfwGetWindowUserPointer(window);
-			glViewport(0, 0, width, height);//sets viewport dimensions
-			win->m_Width = width;
-			win->m_Height = height;
-
-		}
+		//=================KEYBOARD/MOUSE CALLBACKS=======================================
 
 		void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			Window* win = (Window*)glfwGetWindowUserPointer(window);
 			win->m_Keys[key] = action != GLFW_RELEASE;
+	//		std::cout << "Key " << scancode << " is pressed" << std::endl;
+			/*
+#define 	GLFW_KEY_RIGHT   262
+
+#define 	GLFW_KEY_LEFT   263
+
+#define 	GLFW_KEY_DOWN   264
+
+#define 	GLFW_KEY_UP   265
+			*/
+
 
 		}
 
@@ -168,5 +211,11 @@ namespace Erebos {
 			win->m_My = ypos;
 
 		}
+		//=================================================================================
+
+
+		
+
+
 	}
 }

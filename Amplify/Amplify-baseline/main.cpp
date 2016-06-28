@@ -8,6 +8,8 @@
 #include "private_libraries/graphics/buffers/vertexarray.h"
 
 
+
+
 int main()
 {	//====================================Namespace inclusion
 	using namespace Erebos;
@@ -15,8 +17,15 @@ int main()
 	using namespace maths;
 
 	//=====================================Create Window 
-	Window window("Erebos", 960, 540);
-	glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+	
+	Window* window = new Window("Amplify", 960, 540);
+	
+	window->WindowColor(0.5f, 0.2f, 0.5f, 0.3f);
+	
+	
+	
+	
+
 #if 0
 	GLfloat vertices[] =
 	{
@@ -94,8 +103,16 @@ int main()
 
 
 
+	mat4 t1 = mat4::translation(vec3(0, 0, 0));
+	mat4 t2 = mat4::translation(vec3(4, 3, 0));
+	mat4 t3 = mat4::translation(vec3(5, 6, 0));
+		
+
+
+
+
 	//semi-gameloop, window.closed based
-	while (!window.closed())
+	while (!window->closed())
 		{
 
 		//INPUTS
@@ -106,6 +123,15 @@ int main()
 
 		//RENDER
 
+		/*
+		#define 	GLFW_KEY_RIGHT   262
+
+		#define 	GLFW_KEY_LEFT   263
+
+		#define 	GLFW_KEY_DOWN   264
+
+		#define 	GLFW_KEY_UP   265
+		*/
 
 
 
@@ -117,18 +143,17 @@ int main()
 
 
 
-
-		window.clear();
+		window->clear();
 		double x, y;
-		window.getMousePosition(x, y);
-		std::cout << "(X,Y):" << x << "," << y << std::endl;
+		window->getMousePosition(x, y);
+		//std::cout << "(X,Y):" << x << "," << y << std::endl;
 		shader.setUniform2f("light_position", vec2((float)(x*16.0f / 960.0f), (float)(9.0f - y*9.0f / 540.0f)));
 #if 0
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 #else
 		sprite1.bind();
 		ibo.bind();
-		shader.setUniformMat4("ml_matrix", mat4::translation(vec3(0, 0, 0)));
+		shader.setUniformMat4("ml_matrix", t1);
 		glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_SHORT, 0);
 		ibo.unbind();
 		sprite1.unbind();
@@ -136,24 +161,25 @@ int main()
 
 		sprite2.bind();
 		ibo.bind();
-		shader.setUniformMat4("ml_matrix", mat4::translation(vec3(4, 3, 0)));
+		shader.setUniformMat4("ml_matrix", t2);
 		glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_SHORT, 0);
 		ibo.unbind();
 		sprite2.unbind();
 
 		sprite3.bind();
 		ibo.bind();
-		shader.setUniformMat4("ml_matrix", mat4::translation(vec3(5, 6, 0)));
+		shader.setUniformMat4("ml_matrix", t3);
 		glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_SHORT, 0);
 		ibo.unbind();
 		sprite3.unbind();
 #endif
-		system("cls");
-		window.update();
+		//system("cls");
+		window->update();
 		
 
 		}
 
+	window->~Window();
 	return 0;
 
 }
