@@ -102,7 +102,8 @@ int main()
 	shader.setUniform4f("palette", vec4(0.45f, 0.3f, 0.8f, 1.0f));
 
 
-
+	float q, w, e;
+	q = 0; w = 0; e = 0;
 	mat4 t1 = mat4::translation(vec3(0, 0, 0));
 	mat4 t2 = mat4::translation(vec3(4, 3, 0));
 	mat4 t3 = mat4::translation(vec3(5, 6, 0));
@@ -116,12 +117,9 @@ int main()
 		{
 
 		//INPUTS
-
-
-		//LOGIC
-
-
-		//RENDER
+		double x, y;
+		window->getMousePosition(x, y);
+		//std::cout << "(X,Y):" << x << "," << y << std::endl;
 
 		/*
 		#define 	GLFW_KEY_RIGHT   262
@@ -134,23 +132,52 @@ int main()
 		*/
 
 
+		//LOGIC
+		if (window->isKeyPressed(262))
+		{
+			q = q + 0.001;
+			t1 = mat4::translation(vec3(q,w,e));
+		}
 
+		if (window->isKeyPressed(263))
+		{
+			q = q - 0.001;
+			t1 = mat4::translation(vec3(q, w, e));
+		}
 
+		if (window->isKeyPressed(264))
+		{
+			w = w - 0.001;
+			t1 = mat4::translation(vec3(q, w, e));
+		}
 
+		if (window->isKeyPressed(265))
+		{
+			w = w + 0.001;
+			t1 = mat4::translation(vec3(q, w, e));
+		}
 
+		if (window->isKeyPressed(262))
+		{
+			q = q + 0.001;
+			t1 = mat4::translation(vec3(q, w, e));
+		}
 
+		if (window->isKeyPressed(262) && window->isKeyPressed(265))
+		{
+			e = e + 0.0001;
+			t1 = mat4::translation(vec3(q, w, e));
+		}
 
+		if (window->isKeyPressed(263) && window->isKeyPressed(264))
+		{
+			e = e - 0.0001;
+			t1 = mat4::translation(vec3(q, w, e));
+		}
 
-
-
+		//RENDER
 		window->clear();
-		double x, y;
-		window->getMousePosition(x, y);
-		//std::cout << "(X,Y):" << x << "," << y << std::endl;
 		shader.setUniform2f("light_position", vec2((float)(x*16.0f / 960.0f), (float)(9.0f - y*9.0f / 540.0f)));
-#if 0
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-#else
 		sprite1.bind();
 		ibo.bind();
 		shader.setUniformMat4("ml_matrix", t1);
@@ -172,9 +199,29 @@ int main()
 		glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_SHORT, 0);
 		ibo.unbind();
 		sprite3.unbind();
+		
+		window->update();
+
+
+
+
+
+
+
+
+
+
+	
+	
+		
+		
+#if 0
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+#else
+	
 #endif
 		//system("cls");
-		window->update();
+		
 		
 
 		}
