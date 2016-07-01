@@ -6,6 +6,8 @@
 #include "private_libraries/graphics/buffers/buffer.h"
 #include "private_libraries/graphics/buffers/indexbuffer.h"
 #include "private_libraries/graphics/buffers/vertexarray.h"
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
 
 
 
@@ -18,99 +20,82 @@ int main()
 
 	//=====================================Create Window 
 
-	Window* window = new Window("Amplify", 960, 540);
+	Window* window = new Window("Amplify", 1024, 768);
 
-	window->WindowColor(0.5f, 0.2f, 0.5f, 0.3f);
+	window->WindowColor(0.0f, 0.0f, 0.0f, 0.3f);
 
-
-
-
-
-#if 0
-	GLfloat vertices[] =
-	{
-		0, 0, 0,
-		8, 0, 0,
-		0, 3, 0,
-		0, 3, 0,
-		8, 3, 0,
-		8, 0, 0
-	};
-
-	GLuint vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(0);
-#else
 
 	GLfloat vertices[] =
 	{
-		0, 0, 0,
-		0, 0.2, 0,
-		0.4, 0.2, 0,
-		0.4, 0, 0
+		-1.0f, -1.0f, 0.0f,0.0f,
+		1.0f, -1.0f, 0.0f,0.0f,
+		0.0f, 1.0f, 0.0f,0.0f
 	};
 
 	GLushort indices[] =
 	{
-		0, 1, 2,
-		2, 3, 0
+		0, 1, 2
+		
 
 	};
 
 	GLfloat colorsA[] =
 	{
-		0.67, 0.3, 0.3, 0.2,
-		0.67, 0.3, 0.3, 0.2,
-		0.67, 0.3, 0.3, 0.2,
-		0.67, 0.3, 0.3, 0.2
+		0.67f, 0.3f, 0.3f, 0.2f,
+		0.67f, 0.3f, 0.3f, 0.2f,
+		0.67f, 0.3f, 0.3f, 0.2f
+		
 	};
 
 	GLfloat colorsB[] =
 	{
-		0.45f, 0.3f, 0.8f, 1.0f,
-		0.45f, 0.3f, 0.8f, 1.0f,
-		0.45f, 0.3f, 0.8f, 1.0f,
-		0.45f, 0.3f, 0.8f, 1.0f
+		1.0f, 0.0f, 0.0f, 1,
+		1.0f, 0.0f, 0.0f, 1,
+		1.0f, 0.0f, 0.0f, 1
+		
 	};
 
 
 
-	VertexArray sprite1, sprite2, sprite3;
-	IndexBuffer ibo(indices, 6);
+	VertexArray sprite1;
+	IndexBuffer ibo(indices, 3);
 
-	sprite1.addBuffer(new Buffer(vertices, 4 * 3, 3), 0);
-	sprite1.addBuffer(new Buffer(colorsA, 4 * 4, 4), 1);
+	sprite1.addBuffer(new Buffer(vertices, 4 * 3, 4), 0);
+	sprite1.addBuffer(new Buffer(colorsB, 4 * 3, 4), 1);
 
-	sprite2.addBuffer(new Buffer(vertices, 4 * 3, 3), 0);
-	sprite2.addBuffer(new Buffer(colorsB, 4 * 4, 3), 1);
 
-	sprite3.addBuffer(new Buffer(vertices, 4 * 3, 3), 0);
-	sprite3.addBuffer(new Buffer(colorsB, 4 * 4, 2), 1);
 
-#endif
-	mat4 ortho = mat4::ortographic(0.0f, 16.0f, 9.0f, 0.0f, -1.0f, 1.0f);
-	mat4 proj = mat4::perspective(45.0f, 960.0f / 540.0f, 0.1f, 100.0f);
+
+	
 
 
 	Shader shader("private_libraries/shaders/basic.vert", "private_libraries/shaders/basic.frag");
 	shader.enable();
-	//shader.setUniformMat4("pr_matrix", ortho);
-	shader.setUniformMat4("pr_matrix", proj);
-	//shader.setUniformMat4("ml_matrix", mat4::translation(vec3(4, 3, 0)));
+	
+	mat4 rotate = mat4::rotation(180.0f, vec3::vec3(0.0f, 0.0f, 0.1f));
+
+	mat4 projection_matrix = mat4::perspective(30.0f, 1024.0f / 768.0f, 1.0f, 10.0f);
+	// Camera matrix
+	mat4 view_matrix = mat4::lookAt(
+		vec3(4, 3, 3), // Camera is at (4,3,3), in World Space
+		vec3(0, 0, 0), // and looks at the origin
+		vec3(0, 0, 1)  // Head is up (set to 0,-1,0 to look upside-down)
+		);
+	mat4 model_matrix = mat4::identity();
+
+
+	mat4 MVP = projection_matrix * view_matrix*model_matrix;
+
+	shader.setUniformMat4("MVP", MVP);
+	shader.setUniformMat4("rotation", MVP);
+	for (int i = 0; i <= 15; i++)
+		std::cout << "M" << i << "= " << MVP.elements[i] << std::endl;
+	
+	/*shader.setUniformMat4("pr_matrix", proj);
 	shader.setUniformMat4("ml_matrix", mat4::identity());
+	shader.setUniformMat4("vw_matrix", vw_matrix);
+	*/
 
-	//shader.setUniform2f("light_position", vec2(4.0f, 1.5f));
-	shader.setUniform4f("palette", vec4(0.45f, 0.3f, 0.8f, 1.0f));
-
-
-	float q, w, e;
-	q = 0; w = 0; e = 0;
-	mat4 t1 = mat4::translation(vec3(0, 0, 0));
-	mat4 t2 = mat4::translation(vec3(4, 3, 0));
-	mat4 t3 = mat4::translation(vec3(5, 6, 0));
 
 
 
@@ -125,109 +110,24 @@ int main()
 		window->getMousePosition(x, y);
 		//std::cout << "(X,Y):" << x << "," << y << std::endl;
 
-		/*
-		#define 	GLFW_KEY_RIGHT   262
-
-		#define 	GLFW_KEY_LEFT   263
-
-		#define 	GLFW_KEY_DOWN   264
-
-		#define 	GLFW_KEY_UP   265
-		*/
-
-
+	
 		//LOGIC
-		if (window->isKeyPressed(262))
-		{
-			q = q + 0.001;
-			t1 = mat4::translation(vec3(q, w, e));
-		}
-
-		if (window->isKeyPressed(263))
-		{
-			q = q - 0.001;
-			t1 = mat4::translation(vec3(q, w, e));
-		}
-
-		if (window->isKeyPressed(264))
-		{
-			w = w - 0.001;
-			t1 = mat4::translation(vec3(q, w, e));
-		}
-
-		if (window->isKeyPressed(265))
-		{
-			w = w + 0.001;
-			t1 = mat4::translation(vec3(q, w, e));
-		}
-
-		if (window->isKeyPressed(262))
-		{
-			q = q + 0.001;
-			t1 = mat4::translation(vec3(q, w, e));
-		}
-
-		if (window->isKeyPressed(262) && window->isKeyPressed(265))
-		{
-			e = e + 0.0001;
-			t1 = mat4::translation(vec3(q, w, e));
-		}
-
-		if (window->isKeyPressed(263) && window->isKeyPressed(264))
-		{
-			e = e - 0.0001;
-			t1 = mat4::translation(vec3(q, w, e));
-		}
+		
 
 		//RENDER
 		window->clear();
-		shader.setUniform2f("light_position", vec2(x,y));
+
+		
 		sprite1.bind();
 		ibo.bind();
 		//shader.setUniformMat4("ml_matrix", t1);
 		glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_SHORT, 0);
 		ibo.unbind();
 		sprite1.unbind();
-
-
-		sprite2.bind();
-		ibo.bind();
-		//shader.setUniformMat4("ml_matrix", t2);
-		glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_SHORT, 0);
-		ibo.unbind();
-		sprite2.unbind();
-
-		sprite3.bind();
-		ibo.bind();
-		//shader.setUniformMat4("ml_matrix", t3);
-		glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_SHORT, 0);
-		ibo.unbind();
-		sprite3.unbind();
+		
+	
 
 		window->update();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if 0
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-#else
-
-#endif
-		//system("cls");
-
-
-
 	}
 
 	window->~Window();

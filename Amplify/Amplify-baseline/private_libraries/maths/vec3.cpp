@@ -111,6 +111,46 @@ namespace Erebos{
 			return stream;
 		}
 
+		vec3 cross( vec3 one,vec3 two)
+		{
+			vec3 result;
+			result.x = one.y*two.z - one.z*two.y;
+			result.y =one.z*two.x - one.x*two.z;
+			result.z = one.x*two.y - one.y*two.x;
+			return result;
+		}
+
+	/*	vec3& vec3::normalise( vec3 one)
+		{
+			
+			
+			float s;
+			s = sqrt(int(one.x) ^ 2 + int(one.y) ^ 2 + int(one.z) ^ 2);
+			this->x /= s;
+			this->y /= s;
+			this->z /= s;
+			return *this;
+		}
+*/
+		vec3 normalize(vec3 ceva)
+		{
+			float s=0.0f;
+			s = sqrtf(ceva.x*ceva.x + ceva.y*ceva.y +ceva.z*ceva.z);
+			std::cout << "sqrt= " << s << std::endl;
+			ceva.x /= s;
+			ceva.y /= s;
+			ceva.z /= s;
+			return ceva;
+		}
+
+		float dot(vec3 one, vec3 two)
+		{
+			float result;
+			result = one.x*two.x + one.y*two.y+one.z*two.z;
+			return result;
+		}
+
+
 	}
 
 		
